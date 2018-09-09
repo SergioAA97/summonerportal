@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import Axios from "axios";
 import { Consumer } from "../context";
 import Validator from "validator";
+import { getSummonerByName } from "../api/Lolapi";
+import { Spinner } from "./";
 
 class SummonerSearch extends Component {
   state = {
@@ -23,32 +24,17 @@ class SummonerSearch extends Component {
 
     if (
       !Validator.isLength(input, { min: 3, max: 25 }) ||
-      Validator.isEmpty(input)
+      Validator.isEmpty(input) ||
+      !Validator.blacklist(input, `^[0-9\\p{L} _\\.]+$`)
     )
       return;
 
-    Validator.blacklist(input, `^[0-9\\p{L} _\\.]+$`);
-
-    dispatch({
-      type: "DISPLAY_LOADING",
-      payload: true
-    });
-
-    Axios.get(
-      `https://cors-anywhere.herokuapp.com/https://euw1.api.riotgames.com/lol/summoner/v3/summoners/by-name/${input}?api_key=${
-        process.env.REACT_APP_RIOT_KEY
-      }`
-    )
+    getSummonerByName(input)
       .then(res => {
         console.log(res);
         dispatch({
-          type: "SEARCH_SUMMONER",
+          type: "SET_SUMMONER",
           payload: res.data
-        });
-
-        dispatch({
-          type: "DISPLAY_LOADING",
-          payload: false
         });
 
         this.setState({

@@ -1,16 +1,34 @@
 import React, { Component } from "react";
-import Axios from "axios";
 
 const Context = React.createContext();
 
 const reducer = (state, action) => {
+  if (action.callback === "function") {
+    action.callback();
+  }
+
   switch (action.type) {
-    case "SEARCH_SUMMONER":
+    case "SET_SUMMONER":
       return {
         ...state,
-        summoner: action.payload,
-        heading: "Search Results"
+        summoner: action.payload
       };
+    case "SET_RANKED":
+      return {
+        ...state,
+        ranked: action.payload
+      };
+    case "SET_CHAMPION_MASTERY":
+      return {
+        ...state,
+        championMastery: action.payload
+      };
+    case "SET_ERROR": {
+      return {
+        ...state,
+        error: action.payload
+      };
+    }
     case "DISPLAY_LOADING":
       return {
         ...state,
@@ -25,9 +43,11 @@ const reducer = (state, action) => {
 export class Provider extends Component {
   state = {
     summoner: {},
-    heading: "Search Summoner",
+    ranked: [],
+    championMastery: [],
     dispatch: action => this.setState(state => reducer(state, action)),
-    loading: false
+    loading: false,
+    error: {}
   };
 
   render() {
