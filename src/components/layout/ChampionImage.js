@@ -1,5 +1,6 @@
 import React from "react";
 import { getChampionNameFromId } from "../../api/Lolapi";
+import { isEmpty } from "../../validation/is-empty";
 
 const images = require.context("../../img/champion_icon", true);
 const masteryFlairs = require.context("../../img/mastery_flair", true);
@@ -9,6 +10,8 @@ const ChampionImage = ({ champion = "Aatrox" }) => {
 
   let masteryFlair = `./`;
   let masteryImage;
+
+  console.log(champion);
 
   if (
     typeof champion !== "string" &&
@@ -29,7 +32,8 @@ const ChampionImage = ({ champion = "Aatrox" }) => {
     !champion.hasOwnProperty("championLevel") ||
     !level ||
     level < 1 ||
-    level > 7
+    level > 7 ||
+    isEmpty(champion)
   ) {
     masteryImage = <React.Fragment />;
   } else {
@@ -45,7 +49,9 @@ const ChampionImage = ({ champion = "Aatrox" }) => {
 
   return (
     <React.Fragment>
-      <img src={images(src)} alt="Champion Logo" className="img-fluid" />
+      {!isEmpty(champion) && (
+        <img src={images(src)} alt="Champion Logo" className="img-fluid" />
+      )}
       {masteryImage}
     </React.Fragment>
   );

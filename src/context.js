@@ -29,7 +29,7 @@ const reducer = (state, action) => {
     case "SET_ERROR": {
       return {
         ...state,
-        error: action.payload
+        error: { ...action.payload, fatal: action.fatal }
       };
     }
     case "DISPLAY_LOADING":

@@ -1,6 +1,8 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import { RankedImage, Spinner } from "../";
+import { isEmpty } from "../../validation/is-empty";
 
 const RankedStat = ({ label, value }) => {
   return (
@@ -15,16 +17,19 @@ const RankedStats = props => {
   const {
     wins = "..",
     losses = "..",
-    leagueName,
-    tier,
-    rank,
-    leaguePoints = "..",
-    loaded
-  } = props;
+    leagueName = "..",
+    tier = "..",
+    rank = "..",
+    leaguePoints = 0
+  } = props.ranked;
+  const loaded = props.loaded;
 
   if (!loaded) {
     return <Spinner />;
-  } else if (!props.hasOwnProperty("leagueName") && loaded) {
+  } else if (
+    (!props.ranked.hasOwnProperty("leagueName") && loaded) ||
+    (loaded && isEmpty(props.ranked))
+  ) {
     return <h5 className="mb-2">No recent data</h5>;
   } else {
     return (
@@ -45,6 +50,26 @@ const RankedStats = props => {
       </React.Fragment>
     );
   }
+};
+
+RankedStats.propTypes = {
+  ranked: PropTypes.shape({
+    freshBlood: PropTypes.bool,
+    hotStreak: PropTypes.bool,
+    inactive: PropTypes.bool,
+    leagueId: PropTypes.string,
+    leagueName: PropTypes.string,
+    leaguePoints: PropTypes.number,
+    losses: PropTypes.number,
+    playerOrTeamId: PropTypes.string,
+    playerOrTeamName: PropTypes.string,
+    queueType: PropTypes.string,
+    rank: PropTypes.string,
+    tier: PropTypes.string,
+    veteran: PropTypes.bool,
+    wins: PropTypes.number
+  }),
+  loaded: PropTypes.bool
 };
 
 export default RankedStats;

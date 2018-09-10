@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { getChampionNameFromId } from "../../../api/Lolapi";
 import ChampionImage from "../ChampionImage";
 import CardBody from "./CardBody";
@@ -49,7 +50,7 @@ const MatchCard = ({
           >
             <ChampionImage champion={getChampionNameFromId(match.champion)} />
           </div>
-          <div className="col-1 align-self-center" style={{ padding: "0" }}>
+          <div className="col-1 align-self-center p-0">
             <img
               src={laneImg(`./${match.lane}.svg`)}
               alt=""
@@ -72,6 +73,20 @@ const MatchCard = ({
       </div>
     </div>
   );
+};
+
+MatchCard.propTypes = {
+  match: PropTypes.shape({
+    champion: PropTypes.number.isRequired,
+    details: PropTypes.object,
+    gameId: PropTypes.number,
+    lane: PropTypes.string,
+    platformId: PropTypes.string,
+    queue: PropTypes.number,
+    role: PropTypes.string,
+    season: PropTypes.number,
+    timestamp: PropTypes.number
+  })
 };
 
 export default MatchCard;

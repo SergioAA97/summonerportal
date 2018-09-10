@@ -4,7 +4,7 @@ import { Switch, Route, BrowserRouter as Router } from "react-router-dom";
 import { Home, Navbar, SummonerPage } from "./components";
 import { Provider, Consumer } from "./context";
 
-const SumPage = props => {
+const SummonerPageWrapper = props => {
   return (
     <Consumer>
       {value => {
@@ -23,7 +23,11 @@ class App extends Component {
             <Navbar />
             <Switch>
               <Route exact path="/" component={Home} />
-              <Route exact path="/summoner/:summonerName" component={SumPage} />
+              <Route
+                exact
+                path="/summoner/:summonerName"
+                component={SummonerPageWrapper}
+              />
             </Switch>
           </React.Fragment>
         </Router>

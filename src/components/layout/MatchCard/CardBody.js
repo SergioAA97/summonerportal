@@ -19,7 +19,7 @@ const getGameMode = match => {
 
 const CardBody = ({ match }) => (
   <div className="col-6 col-md-6 d-flex pl-0 pt-2 pb-2">
-    <div className="align-self-center text-left pl-2">
+    <div className="align-self-center text-left">
       <p className="mb-1 mt-2">
         {getGameMode(match).replace("games", "")} - {match.details.date}
       </p>
