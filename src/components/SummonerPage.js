@@ -13,10 +13,12 @@ import SummonerHeader from "./layout/SummonerHeader";
 import Spinner from "./layout/Spinner";
 
 import MatchCard from "./layout/MatchCard";
+import timeSince from "../util/TimeSince";
 
 export default class SummonerPage extends Component {
   state = {
-    error: {}
+    error: {},
+    loaded: false
   };
 
   componentDidMount = () => {
@@ -43,7 +45,7 @@ export default class SummonerPage extends Component {
         Axios.all([
           getSummonerRanked(summoner.id),
           getChampionMasteries(summoner.id),
-          getLastMatches(summoner.accountId, 3)
+          getLastMatches(summoner.accountId, 10)
         ])
           .then(
             Axios.spread((rankedRes, masteriesRes, matchRes) => {
@@ -69,7 +71,7 @@ export default class SummonerPage extends Component {
 
                 let newLastMatches = matchRes.data.matches.map((r, i) => {
                   r.details = results[i];
-                  r.details.date = new Date(r.timestamp).toLocaleDateString();
+                  r.details.date = timeSince(new Date(r.timestamp)) + " ago";
                   return r;
                 });
 
@@ -78,7 +80,8 @@ export default class SummonerPage extends Component {
 
                 dispatch({
                   type: "SET_LAST_MATCHES",
-                  payload: newLastMatches
+                  payload: newLastMatches,
+                  callback: this.setState({ loaded: true })
                 });
               });
             })
@@ -105,8 +108,14 @@ export default class SummonerPage extends Component {
   };
 
   render() {
-    const { summoner, ranked, championMastery, lastMatches } = this.props.value;
-    let header, rankedStats, matches;
+    const {
+      summoner,
+      ranked = [],
+      championMastery,
+      lastMatches
+    } = this.props.value;
+    const { loaded } = this.state;
+    let header, rankedStats;
     const { name, profileIconId, summonerLevel } = summoner;
 
     if (isEmpty(summoner) || isEmpty(championMastery)) {
@@ -135,12 +144,12 @@ export default class SummonerPage extends Component {
         <div className="col-12 col-md-6">
           <h3>Ranked Solo</h3>
           <hr />
-          <RankedStats {...ranked[0]} />
+          <RankedStats {...ranked[0]} loaded={loaded} />
         </div>
         <div className="col-12 col-md-6">
           <h3>Ranked Flex</h3>
           <hr />
-          <RankedStats {...ranked[1]} />
+          <RankedStats {...ranked[1]} loaded={loaded} />
         </div>
       </React.Fragment>
     );
@@ -159,18 +168,17 @@ export default class SummonerPage extends Component {
             <div className="col-12">
               <h3>Recent Matches</h3>
               <hr />
-              <MatchCard
-                match={lastMatches[0]}
-                accountId={summoner.accountId}
-              />
-              <MatchCard
-                match={lastMatches[1]}
-                accountId={summoner.accountId}
-              />
-              <MatchCard
-                match={lastMatches[2]}
-                accountId={summoner.accountId}
-              />
+              {lastMatches.length > 0 ? (
+                lastMatches.map(lastMatch => (
+                  <MatchCard
+                    key={lastMatch.gameId}
+                    match={lastMatch}
+                    accountId={summoner.accountId}
+                  />
+                ))
+              ) : (
+                <Spinner />
+              )}
             </div>
           </div>
         </div>

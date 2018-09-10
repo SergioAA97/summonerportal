@@ -9,14 +9,13 @@ const stringified = JSON.stringify(gamemodes);
 const parsed = JSON.parse(stringified);
 
 const getGameMode = match => {
-  console.log(parsed, parsed[0].id, match["details"]["queueId"], match);
+  //console.log(parsed, parsed[0].id, match["details"]["queueId"], match);
   if (match["details"].hasOwnProperty("queueId") && !isEmpty(parsed)) {
     let result = parsed.filter(r => r["id"] === match["details"]["queueId"]);
-    console.log("RESULT:", result);
     return result[0].description;
   }
 
-  console.log("NOT FOUND");
+  console.log("GAMEMODE NOT FOUND");
   return undefined;
 };
 
@@ -25,15 +24,10 @@ const getWin = (match, accountId) => {
     if (match.details.hasOwnProperty("participants")) {
       let indexInParticipants;
       let winnerTeam = match.details.teams.filter(team => team.win === "Win");
-      console.log("winnerTeam ", winnerTeam, match, accountId);
+      //console.log("winnerTeam ", winnerTeam, match, accountId);
 
       let summonerInMatch = match.details.participantIdentities.filter(
         (r, index) => {
-          console.log(
-            r.player.accountId,
-            r.player.accountId === accountId,
-            accountId
-          );
           if (r["player"]["accountId"] === accountId) {
             indexInParticipants = index;
             return true;
@@ -41,21 +35,39 @@ const getWin = (match, accountId) => {
           return false;
         }
       );
-      console.log("Summoner In Match ", summonerInMatch);
-      let result = match.details.participants[indexInParticipants];
 
-      console.log("Result is an empty object", result.stats.win);
-      return result.stats.win;
+      //console.log("Summoner In Match ", summonerInMatch);
+      let result = match.details.participants[indexInParticipants];
+      if (summonerInMatch) return result.stats.win;
+
+      //console.log("Result is an empty object", result.stats.win);
+      return false;
     }
   }
 };
+
+const CardBody = ({ match }) => (
+  <div className="col-6 col-md-6 d-flex pl-0 pt-2 pb-2">
+    <div className="align-self-center text-left pl-2">
+      <p className="mb-1 mt-2">
+        {getGameMode(match).replace("games", "")} - {match.details.date}
+      </p>
+      <h4 className="mb-0 mt-1 ml-0">
+        {getChampionNameFromId(match.champion)}
+      </h4>
+      <p className="mt-0" style={{ fontSize: "1rem" }}>
+        {match.lane.charAt(0).toUpperCase() + match.lane.slice(1).toLowerCase()}
+      </p>
+    </div>
+  </div>
+);
 
 const MatchCard = ({
   match = { lane: "NONE", champion: 54, details: { gameMode: "ARAM" } },
   accountId
 }) => {
   let win = getWin(match, accountId);
-  console.log(win);
+
   return (
     <div className="row mt-1 mb-1">
       <div
@@ -79,20 +91,8 @@ const MatchCard = ({
               className="p-2 img-fluid"
             />
           </div>
-          <div className="col-6 col-md-6 d-flex pl-0 pt-2 pb-2">
-            <div className="align-self-center text-left pl-2">
-              <p className="mb-1 mt-2">
-                {getGameMode(match)} - {match.details.date}
-              </p>
-              <h4 className="mb-0 mt-1 ml-0">
-                {getChampionNameFromId(match.champion)}
-              </h4>
-              <p className="mt-0" style={{ fontSize: "1rem" }}>
-                {match.lane.charAt(0).toUpperCase() +
-                  match.lane.slice(1).toLowerCase()}
-              </p>
-            </div>
-          </div>
+          {/* Body */}
+          <CardBody match={match} />
           <div className="col-3 d-flex justify-content-end text-right">
             <div className="align-self-center">
               <span className="font-weight-bold">

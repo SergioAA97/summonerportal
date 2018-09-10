@@ -3,6 +3,7 @@ import { getChampionNameFromId } from "../../api/Lolapi";
 
 const images = require.context("../../img/champion_icon", true);
 const masteryFlairs = require.context("../../img/mastery_flair", true);
+
 const ChampionImage = ({ champion = "Aatrox" }) => {
   let src = `./${champion}.png`;
 
@@ -15,7 +16,12 @@ const ChampionImage = ({ champion = "Aatrox" }) => {
     typeof champion !== undefined &&
     champion.hasOwnProperty("championId")
   ) {
-    src = `./${getChampionNameFromId(champion.championId)}.png`;
+    let championName = getChampionNameFromId(champion.championId);
+    championName = championName.replace(/[^\w\s]/gi, "");
+    src = `./${championName}.png`;
+  } else if (typeof champion === "string") {
+    champion = champion.replace(/[^\w\s]/gi, "");
+    src = `./${champion}.png`;
   }
 
   let level = parseInt(champion.championLevel, 10);
@@ -34,7 +40,7 @@ const ChampionImage = ({ champion = "Aatrox" }) => {
 
   return (
     <React.Fragment>
-      <img src={images(src)} alt="Rank Logo" className="img-fluid" />
+      <img src={images(src)} alt="Champion Logo" className="img-fluid" />
       {masteryImage}
     </React.Fragment>
   );
