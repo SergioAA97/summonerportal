@@ -11,6 +11,7 @@ import {
 import RankedStats from "./layout/RankedStats";
 import SummonerHeader from "./layout/SummonerHeader";
 import Spinner from "./layout/Spinner";
+import Error from "./layout/Error";
 
 import MatchCard from "./layout/MatchCard/MatchCard";
 import timeSince from "../util/TimeSince";
@@ -57,24 +58,32 @@ export default class SummonerPage extends Component {
                 getMatch(r.gameId)
               );
 
-              Axios.all(matchRequests).then(res => {
-                let results = res.map(r => r.data);
+              Axios.all(matchRequests)
+                .then(res => {
+                  let results = res.map(r => r.data);
 
-                let newLastMatches = matchRes.data.matches.map((r, i) => {
-                  r.details = results[i];
-                  r.details.date = timeSince(new Date(r.timestamp)) + " ago";
-                  return r;
+                  let newLastMatches = matchRes.data.matches.map((r, i) => {
+                    r.details = results[i];
+                    r.details.date = timeSince(new Date(r.timestamp)) + " ago";
+                    return r;
+                  });
+
+                  //console.log(results);
+                  console.log("New last matches", newLastMatches);
+
+                  dispatch({
+                    type: "SET_LAST_MATCHES",
+                    payload: newLastMatches,
+                    callback: this.setState({ loaded: true })
+                  });
+                })
+                .catch(err => {
+                  console.log(err);
+                  dispatch({
+                    type: "SET_ERROR",
+                    payload: err
+                  });
                 });
-
-                //console.log(results);
-                console.log("New last matches", newLastMatches);
-
-                dispatch({
-                  type: "SET_LAST_MATCHES",
-                  payload: newLastMatches,
-                  callback: this.setState({ loaded: true })
-                });
-              });
             })
           )
           .catch(err =>
@@ -103,7 +112,8 @@ export default class SummonerPage extends Component {
       summoner,
       ranked = [],
       championMastery,
-      lastMatches
+      lastMatches,
+      error
     } = this.props.value;
     const { loaded } = this.state;
     let header, rankedStats;
@@ -146,12 +156,10 @@ export default class SummonerPage extends Component {
     );
 
     //console.log("Render!");
-    if (!isEmpty(this.state.error)) {
+    if (!isEmpty(error)) {
       return (
         <div className="container text-center mt-5">
-          <i className="fas fa-unlink fa-5x mt-2 mb-5" />
-          <h2 className="font-weight-bold">404</h2>
-          <h3>Summoner not found</h3>
+          <Error error={error} value={this.props.value} />
         </div>
       );
     } else {

@@ -10,7 +10,6 @@ const ChampionImage = ({ champion = "Aatrox" }) => {
   let masteryFlair = `./`;
   let masteryImage;
 
-  //console.log("Champion passed to image:", champion);
   if (
     typeof champion !== "string" &&
     typeof champion !== undefined &&
@@ -25,7 +24,13 @@ const ChampionImage = ({ champion = "Aatrox" }) => {
   }
 
   let level = parseInt(champion.championLevel, 10);
-  if (!champion.hasOwnProperty("championLevel") || !level) {
+
+  if (
+    !champion.hasOwnProperty("championLevel") ||
+    !level ||
+    level < 1 ||
+    level > 7
+  ) {
     masteryImage = <React.Fragment />;
   } else {
     masteryFlair = `./Level${level}.png`;

@@ -54,12 +54,9 @@ export const getChampionNameFromId = id => {
 
   for (var key in championsJSON.data) {
     if (championsJSON.data.hasOwnProperty(key)) {
-      //console.log(championsJSON.data[key].key);
-      //console.log(parseInt(championsJSON.data[key].key, 10));
       if (parseInt(championsJSON.data[key].key, 10) === id) {
         let result = championsJSON.data[key].name.trim();
         result = result.replace(/\s/g, "");
-        //console.log(result);
         if (result === "Nunu&Willump") return "Nunu";
         return result;
       }

@@ -40,7 +40,13 @@ class SummonerSearch extends Component {
           redirect: true
         });
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log(err);
+        dispatch({
+          type: "SET_ERROR",
+          payload: err.data
+        });
+      });
   };
 
   render() {

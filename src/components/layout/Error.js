@@ -21,10 +21,7 @@ export class Error extends Component {
           style={{ marginTop: "5rem" }}
         >
           <i className="fas fa-exclamation-triangle fa-5x" />
-          <h2 className="mt-4 mb-4">
-            {this.props.error.status}
-            503
-          </h2>
+          <h2 className="mt-4 mb-4">{this.props.error.status}</h2>
           <div className="text-center font-italic">
             Uh oh, something didn't work out.
           </div>
