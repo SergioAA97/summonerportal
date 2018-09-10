@@ -1,7 +1,6 @@
 import React from "react";
 
 import { RankedImage, Spinner } from "../";
-import { isEmpty } from "../../validation/is-empty";
 
 const RankedStat = ({ label, value }) => {
   return (

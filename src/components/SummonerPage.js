@@ -12,7 +12,7 @@ import RankedStats from "./layout/RankedStats";
 import SummonerHeader from "./layout/SummonerHeader";
 import Spinner from "./layout/Spinner";
 
-import MatchCard from "./layout/MatchCard";
+import MatchCard from "./layout/MatchCard/MatchCard";
 import timeSince from "../util/TimeSince";
 
 export default class SummonerPage extends Component {
@@ -27,16 +27,11 @@ export default class SummonerPage extends Component {
 
     getSummonerByName(this.props.match.params.summonerName)
       .then(res => {
-        //We have summoner
-        //console.log(`Summoner By Name:`, res.data);
-
         if (!isEmpty(res.data)) {
           dispatch({
             type: "SET_SUMMONER",
             payload: res.data
           });
-        } else {
-          //console.log("Summoner data is empty!");
         }
       })
       .then(res => {
@@ -49,10 +44,6 @@ export default class SummonerPage extends Component {
         ])
           .then(
             Axios.spread((rankedRes, masteriesRes, matchRes) => {
-              //console.log("Summoner:", summoner);
-              //console.log(`Summoner Ranked:`, rankedRes.data);
-              //console.log(`Summoner Champion Masteries:`, masteriesRes.data);
-              //console.log(`Summoner Last Matches:`, matchRes.data);
               dispatch({
                 type: "SET_RANKED",
                 payload: rankedRes.data
@@ -156,7 +147,13 @@ export default class SummonerPage extends Component {
 
     //console.log("Render!");
     if (!isEmpty(this.state.error)) {
-      return <h3 className="display-3">404 Summoner not found</h3>;
+      return (
+        <div className="container text-center mt-5">
+          <i className="fas fa-unlink fa-5x mt-2 mb-5" />
+          <h2 className="font-weight-bold">404</h2>
+          <h3>Summoner not found</h3>
+        </div>
+      );
     } else {
       return (
         <div className="container">

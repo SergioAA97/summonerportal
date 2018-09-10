@@ -1,31 +1,15 @@
 import React from "react";
-import { getChampionNameFromId } from "../../api/Lolapi";
-import ChampionImage from "./ChampionImage";
-import { isEmpty } from "../../validation/is-empty";
+import { getChampionNameFromId } from "../../../api/Lolapi";
+import ChampionImage from "../ChampionImage";
+import CardBody from "./CardBody";
+import { isEmpty } from "../../../validation/is-empty";
 
-const laneImg = require.context("../../img/lanes", true);
-const gamemodes = require("../../api/gamemodes.json");
-const stringified = JSON.stringify(gamemodes);
-const parsed = JSON.parse(stringified);
-
-const getGameMode = match => {
-  //console.log(parsed, parsed[0].id, match["details"]["queueId"], match);
-  if (match["details"].hasOwnProperty("queueId") && !isEmpty(parsed)) {
-    let result = parsed.filter(r => r["id"] === match["details"]["queueId"]);
-    return result[0].description;
-  }
-
-  console.log("GAMEMODE NOT FOUND");
-  return undefined;
-};
+const laneImg = require.context("../../../img/lanes", true);
 
 const getWin = (match, accountId) => {
   if (!isEmpty(match)) {
     if (match.details.hasOwnProperty("participants")) {
       let indexInParticipants;
-      let winnerTeam = match.details.teams.filter(team => team.win === "Win");
-      //console.log("winnerTeam ", winnerTeam, match, accountId);
-
       let summonerInMatch = match.details.participantIdentities.filter(
         (r, index) => {
           if (r["player"]["accountId"] === accountId) {
@@ -36,31 +20,12 @@ const getWin = (match, accountId) => {
         }
       );
 
-      //console.log("Summoner In Match ", summonerInMatch);
       let result = match.details.participants[indexInParticipants];
       if (summonerInMatch) return result.stats.win;
-
-      //console.log("Result is an empty object", result.stats.win);
       return false;
     }
   }
 };
-
-const CardBody = ({ match }) => (
-  <div className="col-6 col-md-6 d-flex pl-0 pt-2 pb-2">
-    <div className="align-self-center text-left pl-2">
-      <p className="mb-1 mt-2">
-        {getGameMode(match).replace("games", "")} - {match.details.date}
-      </p>
-      <h4 className="mb-0 mt-1 ml-0">
-        {getChampionNameFromId(match.champion)}
-      </h4>
-      <p className="mt-0" style={{ fontSize: "1rem" }}>
-        {match.lane.charAt(0).toUpperCase() + match.lane.slice(1).toLowerCase()}
-      </p>
-    </div>
-  </div>
-);
 
 const MatchCard = ({
   match = { lane: "NONE", champion: 54, details: { gameMode: "ARAM" } },

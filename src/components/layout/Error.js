@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Consumer } from "../../context";
 
 export class Error extends Component {
   resetError = () => {

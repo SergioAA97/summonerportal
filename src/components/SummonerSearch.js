@@ -3,7 +3,6 @@ import { Redirect } from "react-router-dom";
 import { Consumer } from "../context";
 import Validator from "validator";
 import { getSummonerByName } from "../api/Lolapi";
-import { Spinner } from "./";
 
 class SummonerSearch extends Component {
   state = {
