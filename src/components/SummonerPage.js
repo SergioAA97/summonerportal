@@ -4,17 +4,19 @@ import { isEmpty } from "../validation/is-empty";
 import {
   getSummonerByName,
   getSummonerRanked,
-  getChampionMasteries
+  getChampionMasteries,
+  getLastMatches,
+  getMatch
 } from "../api/Lolapi";
 import RankedStats from "./layout/RankedStats";
 import SummonerHeader from "./layout/SummonerHeader";
 import Spinner from "./layout/Spinner";
 
+import MatchCard from "./layout/MatchCard";
+
 export default class SummonerPage extends Component {
   state = {
-    error: {},
-    loadingSummoner: false,
-    loadingRanked: false
+    error: {}
   };
 
   componentDidMount = () => {
@@ -24,7 +26,7 @@ export default class SummonerPage extends Component {
     getSummonerByName(this.props.match.params.summonerName)
       .then(res => {
         //We have summoner
-        console.log(`Summoner By Name:`, res.data);
+        //console.log(`Summoner By Name:`, res.data);
 
         if (!isEmpty(res.data)) {
           dispatch({
@@ -32,39 +34,52 @@ export default class SummonerPage extends Component {
             payload: res.data
           });
         } else {
-          console.log("Summoner data is empty!");
+          //console.log("Summoner data is empty!");
         }
       })
       .then(res => {
         summoner = this.props.value.summoner;
 
-        this.setState({
-          loadingSummoner: false
-        });
-
         Axios.all([
           getSummonerRanked(summoner.id),
-          getChampionMasteries(summoner.id)
+          getChampionMasteries(summoner.id),
+          getLastMatches(summoner.accountId, 3)
         ])
           .then(
-            Axios.spread((rankedRes, masteriesRes) => {
-              console.log("Summoner:", summoner);
-              console.log(`Summoner Ranked:`, rankedRes.data);
-              console.log(`Summoner Champion Masteries:`, masteriesRes.data);
-              dispatch(
-                {
-                  type: "SET_RANKED",
-                  payload: rankedRes.data
-                },
-                () => {
-                  this.setState({
-                    loadingRanked: false
-                  });
-                }
-              );
+            Axios.spread((rankedRes, masteriesRes, matchRes) => {
+              //console.log("Summoner:", summoner);
+              //console.log(`Summoner Ranked:`, rankedRes.data);
+              //console.log(`Summoner Champion Masteries:`, masteriesRes.data);
+              //console.log(`Summoner Last Matches:`, matchRes.data);
+              dispatch({
+                type: "SET_RANKED",
+                payload: rankedRes.data
+              });
               dispatch({
                 type: "SET_CHAMPION_MASTERY",
                 payload: masteriesRes.data
+              });
+
+              let matchRequests = matchRes.data.matches.map(r =>
+                getMatch(r.gameId)
+              );
+
+              Axios.all(matchRequests).then(res => {
+                let results = res.map(r => r.data);
+
+                let newLastMatches = matchRes.data.matches.map((r, i) => {
+                  r.details = results[i];
+                  r.details.date = new Date(r.timestamp).toLocaleDateString();
+                  return r;
+                });
+
+                //console.log(results);
+                console.log("New last matches", newLastMatches);
+
+                dispatch({
+                  type: "SET_LAST_MATCHES",
+                  payload: newLastMatches
+                });
               });
             })
           )
@@ -90,9 +105,8 @@ export default class SummonerPage extends Component {
   };
 
   render() {
-    const { summoner, ranked, championMastery } = this.props.value;
-    const { loadingRanked, loadingSummoner } = this.state;
-    let header, rankedStats;
+    const { summoner, ranked, championMastery, lastMatches } = this.props.value;
+    let header, rankedStats, matches;
     const { name, profileIconId, summonerLevel } = summoner;
 
     if (isEmpty(summoner) || isEmpty(championMastery)) {
@@ -131,7 +145,7 @@ export default class SummonerPage extends Component {
       </React.Fragment>
     );
 
-    console.log("Render!");
+    //console.log("Render!");
     if (!isEmpty(this.state.error)) {
       return <h3 className="display-3">404 Summoner not found</h3>;
     } else {
@@ -141,6 +155,24 @@ export default class SummonerPage extends Component {
           <div className="row mt-4">{header}</div>
           {/* Head end */}
           <div className="row mt-5 text-center">{rankedStats}</div>
+          <div className="row mt-5 text-center">
+            <div className="col-12">
+              <h3>Recent Matches</h3>
+              <hr />
+              <MatchCard
+                match={lastMatches[0]}
+                accountId={summoner.accountId}
+              />
+              <MatchCard
+                match={lastMatches[1]}
+                accountId={summoner.accountId}
+              />
+              <MatchCard
+                match={lastMatches[2]}
+                accountId={summoner.accountId}
+              />
+            </div>
+          </div>
         </div>
       );
     }

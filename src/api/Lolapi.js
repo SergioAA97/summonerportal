@@ -32,6 +32,23 @@ export const getChampionMasteries = id => {
   );
 };
 
+export const getLastMatches = (id, amount) => {
+  if (typeof amount !== "number") amount = 5;
+  return Axios.get(
+    `https://cors-anywhere.herokuapp.com/https://euw1.api.riotgames.com/lol/match/v3/matchlists/by-account/${id}?endIndex=${amount}&api_key=${
+      process.env.REACT_APP_RIOT_KEY
+    }`
+  );
+};
+
+export const getMatch = id => {
+  return Axios.get(
+    `https://cors-anywhere.herokuapp.com/https://euw1.api.riotgames.com/lol/match/v3/matches/${id}?api_key=${
+      process.env.REACT_APP_RIOT_KEY
+    }`
+  );
+};
+
 export const getChampionNameFromId = id => {
   const championsJSON = require("./champions.json");
 
@@ -42,7 +59,7 @@ export const getChampionNameFromId = id => {
       if (parseInt(championsJSON.data[key].key, 10) === id) {
         let result = championsJSON.data[key].name.trim();
         result = result.replace(/\s/g, "");
-        console.log(result);
+        //console.log(result);
         if (result === "Nunu&Willump") return "Nunu";
         return result;
       }

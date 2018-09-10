@@ -4,12 +4,12 @@ import { getChampionNameFromId } from "../../api/Lolapi";
 const images = require.context("../../img/champion_icon", true);
 const masteryFlairs = require.context("../../img/mastery_flair", true);
 const ChampionImage = ({ champion = "Aatrox" }) => {
-  let src = `./Aatrox.png`;
+  let src = `./${champion}.png`;
 
   let masteryFlair = `./`;
   let masteryImage;
 
-  console.log("Champion passed to image:", champion);
+  //console.log("Champion passed to image:", champion);
   if (
     typeof champion !== "string" &&
     typeof champion !== undefined &&
