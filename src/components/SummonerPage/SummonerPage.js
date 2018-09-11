@@ -20,7 +20,7 @@ import timeSince from "../../util/TimeSince";
 
 const Ranked = ({ ranked, loaded }) => (
   <React.Fragment>
-    <div className="col-12 col-md-6">
+    <div className="col-12 col-md-6 mb-3">
       <h3>Ranked Solo</h3>
       <hr />
       {loaded ? (
@@ -29,7 +29,7 @@ const Ranked = ({ ranked, loaded }) => (
         <Spinner />
       )}
     </div>
-    <div className="col-12 col-md-6">
+    <div className="col-12 col-md-6 mb-3">
       <h3>Ranked Flex</h3>
       <hr />
       {loaded ? (
@@ -48,8 +48,18 @@ class SummonerPage extends Component {
   };
 
   componentDidMount = () => {
-    let { dispatch, summoner } = this.props.value;
+    this.getSummonerData();
+  };
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.value.summoner.name !== this.props.value.summoner.name) {
+      this.getSummonerData();
+    }
+  }
+
+  getSummonerData = () => {
+    let { dispatch, summoner } = this.props.value;
+    this.setState({ loaded: false });
     getSummonerByName(this.props.match.params.summonerName)
       .then(res => {
         if (!isEmpty(res.data)) {
@@ -100,6 +110,7 @@ class SummonerPage extends Component {
                     payload: newLastMatches,
                     callback: this.setState({ loaded: true })
                   });
+                  this.setState({ loaded: true });
                 })
                 .catch(err => {
                   console.log(err);

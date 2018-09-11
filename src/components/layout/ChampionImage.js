@@ -11,8 +11,6 @@ const ChampionImage = ({ champion = "Aatrox" }) => {
   let masteryFlair = `./`;
   let masteryImage;
 
-  console.log(champion);
-
   if (
     typeof champion !== "string" &&
     typeof champion !== undefined &&

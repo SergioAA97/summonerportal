@@ -173,5 +173,10 @@
     "id": 76,
     "map": "Summoner's Rift",
     "description": "Ultra Rapid Fire games"
+  },
+  {
+    "id": 1010,
+    "map": "Summoner's Rift",
+    "description": "Snow ARURF games"
   }
 ]

@@ -1,6 +1,7 @@
 import Axios from "axios";
 import Validator from "validator";
 import { isString } from "../validation/is-string";
+import { isEmpty } from "../validation/is-empty";
 
 export const getSummonerByName = summonerName => {
   if (
@@ -64,4 +65,39 @@ export const getChampionNameFromId = id => {
   }
 
   return "Jax";
+};
+
+export const searchSummoner = (input, dispatch, callback, errCallback) => {
+  getSummonerByName(input)
+    .then(res => {
+      console.log(res);
+      dispatch({
+        type: "SET_SUMMONER",
+        payload: res.data,
+        callback: callback
+      });
+      if (isEmpty(res.data)) {
+        dispatch({
+          type: "SET_ERROR",
+          payload: { response: { status: 404 } },
+          callback: errCallback
+        });
+      }
+    })
+    .catch(err => {
+      if (err.response.status === 404) {
+        //Summoner not found
+        dispatch({
+          type: "SET_ERROR",
+          payload: { response: { status: 404 } },
+          callback: errCallback
+        });
+      } else {
+        dispatch({
+          type: "SET_ERROR",
+          payload: err,
+          fatal: false
+        });
+      }
+    });
 };

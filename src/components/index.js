@@ -1,5 +1,5 @@
 import Home from "./Home/Home";
-import { Navbar } from "./layout/Navbar";
+import Navbar from "./layout/Navbar";
 import SummonerSearch from "./Home/SummonerSearch";
 import SummonerPage from "./SummonerPage/SummonerPage";
 import RankedStats from "./layout/RankedStats";

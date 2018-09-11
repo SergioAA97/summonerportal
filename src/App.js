@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { Switch, Route, BrowserRouter as Router } from "react-router-dom";
 
-import { Home, Navbar, SummonerPage } from "./components";
+import { Home, SummonerPage } from "./components";
+import Navbar from "./components/layout/Navbar";
 import { Provider, Consumer } from "./context";
 
 const SummonerPageWrapper = props => {
@@ -14,13 +15,25 @@ const SummonerPageWrapper = props => {
   );
 };
 
+const NavbarWrapper = props => {
+  return (
+    <Consumer>
+      {value => {
+        return <Navbar value={value} {...props} />;
+      }}
+    </Consumer>
+  );
+};
+
 class App extends Component {
   render() {
     return (
       <Provider>
         <Router>
           <React.Fragment>
-            <Navbar />
+            <Route
+              render={({ history }) => <NavbarWrapper history={history} />}
+            />
             <Switch>
               <Route exact path="/" component={Home} />
               <Route

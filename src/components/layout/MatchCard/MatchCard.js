@@ -22,7 +22,7 @@ const getWin = (match, accountId) => {
       );
 
       let result = match.details.participants[indexInParticipants];
-      if (summonerInMatch) return result.stats.win;
+      if (summonerInMatch && result) return result.stats.win;
       return false;
     }
   }
