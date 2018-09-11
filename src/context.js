@@ -16,16 +16,19 @@ const reducer = (state, action) => {
     case "SET_RANKED":
       return {
         ...state,
-        ranked: action.payload
+        summoner: { ...state.summoner, ranked: action.payload }
       };
     case "SET_CHAMPION_MASTERY":
       return {
         ...state,
-        championMastery: action.payload
+        summoner: { ...state.summoner, championMastery: action.payload }
       };
 
     case "SET_LAST_MATCHES":
-      return { ...state, lastMatches: action.payload };
+      return {
+        ...state,
+        summoner: { ...state.summoner, lastMatches: action.payload }
+      };
     case "SET_ERROR": {
       return {
         ...state,
@@ -45,10 +48,12 @@ const reducer = (state, action) => {
 
 export class Provider extends Component {
   state = {
-    summoner: {},
-    ranked: [],
-    championMastery: [],
-    lastMatches: [],
+    summoner: {
+      ranked: [],
+      championMastery: [],
+      lastMatches: []
+    },
+
     dispatch: action => this.setState(state => reducer(state, action)),
     loading: false,
     error: {}

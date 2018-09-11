@@ -154,13 +154,18 @@ class SummonerPage extends Component {
   render() {
     const {
       summoner,
-      ranked = [],
-      championMastery,
-      lastMatches,
+
       error
     } = this.props.value;
     const { loaded } = this.state;
-    const { name, profileIconId, summonerLevel } = summoner;
+    const {
+      name,
+      profileIconId,
+      summonerLevel,
+      ranked = [],
+      championMastery = [],
+      lastMatches
+    } = summoner;
 
     if (!isEmpty(error) && error.fatal) {
       return (
