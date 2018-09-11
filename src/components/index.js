@@ -1,8 +1,7 @@
-import Home from "./Home";
-import { Navbar } from "./Navbar";
-import SummonerSearch from "./SummonerSearch";
-import SummonerPage from "./SummonerPage";
-import SummonerMatch from "./SummonerMatch";
+import Home from "./Home/Home";
+import Navbar from "./layout/Navbar";
+import SummonerSearch from "./Home/SummonerSearch";
+import SummonerPage from "./SummonerPage/SummonerPage";
 import RankedStats from "./layout/RankedStats";
 import RankedImage from "./layout/RankedImage";
 import ChampionImage from "./layout/ChampionImage";
@@ -15,7 +14,6 @@ export {
   Error,
   SummonerSearch,
   SummonerPage,
-  SummonerMatch,
   RankedStats,
   RankedImage,
   ChampionImage,

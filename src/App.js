@@ -1,15 +1,25 @@
 import React, { Component } from "react";
 import { Switch, Route, BrowserRouter as Router } from "react-router-dom";
-import "./App.css";
 
-import { Home, Navbar, SummonerPage } from "./components";
+import { Home, SummonerPage } from "./components";
+import Navbar from "./components/layout/Navbar";
 import { Provider, Consumer } from "./context";
 
-const SumPage = props => {
+const SummonerPageWrapper = props => {
   return (
     <Consumer>
       {value => {
         return <SummonerPage value={{ ...value }} {...props} />;
+      }}
+    </Consumer>
+  );
+};
+
+const NavbarWrapper = props => {
+  return (
+    <Consumer>
+      {value => {
+        return <Navbar value={value} {...props} />;
       }}
     </Consumer>
   );
@@ -21,10 +31,16 @@ class App extends Component {
       <Provider>
         <Router>
           <React.Fragment>
-            <Navbar />
+            <Route
+              render={({ history }) => <NavbarWrapper history={history} />}
+            />
             <Switch>
               <Route exact path="/" component={Home} />
-              <Route exact path="/summoner/:summonerName" component={SumPage} />
+              <Route
+                exact
+                path="/summoner/:summonerName"
+                component={SummonerPageWrapper}
+              />
             </Switch>
           </React.Fragment>
         </Router>

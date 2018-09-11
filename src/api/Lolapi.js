@@ -1,6 +1,7 @@
 import Axios from "axios";
 import Validator from "validator";
 import { isString } from "../validation/is-string";
+import { isEmpty } from "../validation/is-empty";
 
 export const getSummonerByName = summonerName => {
   if (
@@ -54,12 +55,9 @@ export const getChampionNameFromId = id => {
 
   for (var key in championsJSON.data) {
     if (championsJSON.data.hasOwnProperty(key)) {
-      //console.log(championsJSON.data[key].key);
-      //console.log(parseInt(championsJSON.data[key].key, 10));
       if (parseInt(championsJSON.data[key].key, 10) === id) {
         let result = championsJSON.data[key].name.trim();
         result = result.replace(/\s/g, "");
-        //console.log(result);
         if (result === "Nunu&Willump") return "Nunu";
         return result;
       }
@@ -67,4 +65,39 @@ export const getChampionNameFromId = id => {
   }
 
   return "Jax";
+};
+
+export const searchSummoner = (input, dispatch, callback, errCallback) => {
+  getSummonerByName(input)
+    .then(res => {
+      console.log(res);
+      dispatch({
+        type: "SET_SUMMONER",
+        payload: res.data,
+        callback: callback
+      });
+      if (isEmpty(res.data)) {
+        dispatch({
+          type: "SET_ERROR",
+          payload: { response: { status: 404 } },
+          callback: errCallback
+        });
+      }
+    })
+    .catch(err => {
+      if (err.response.status === 404) {
+        //Summoner not found
+        dispatch({
+          type: "SET_ERROR",
+          payload: { response: { status: 404 } },
+          callback: errCallback
+        });
+      } else {
+        dispatch({
+          type: "SET_ERROR",
+          payload: err,
+          fatal: false
+        });
+      }
+    });
 };
