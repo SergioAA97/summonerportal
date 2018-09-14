@@ -3,7 +3,7 @@ import Validator from "validator";
 import { isString } from "../validation/is-string";
 import { isEmpty } from "../validation/is-empty";
 
-export const getSummonerByName = summonerName => {
+export const getSummonerByName = (summonerName, source) => {
   if (
     !isString(summonerName) ||
     !Validator.blacklist(summonerName, `^[0-9\\p{L} _\\.]+$`)
@@ -13,32 +13,32 @@ export const getSummonerByName = summonerName => {
   return Axios.get(
     `https://cors-anywhere.herokuapp.com/https://euw1.api.riotgames.com/lol/summoner/v3/summoners/by-name/${summonerName}?api_key=${
       process.env.REACT_APP_RIOT_KEY
-    }`
+    }`,{cancelToken: source.token}
   );
 };
 
-export const getSummonerRanked = id => {
+export const getSummonerRanked = (id, source) => {
   return Axios.get(
     `https://cors-anywhere.herokuapp.com/https://euw1.api.riotgames.com/lol/league/v3/positions/by-summoner/${id}?api_key=${
       process.env.REACT_APP_RIOT_KEY
-    }`
+    }`, {cancelToken: source.token}
   );
 };
 
-export const getChampionMasteries = id => {
+export const getChampionMasteries = (id,source) => {
   return Axios.get(
     `https://cors-anywhere.herokuapp.com/https://euw1.api.riotgames.com/lol/champion-mastery/v3/champion-masteries/by-summoner/${id}?api_key=${
       process.env.REACT_APP_RIOT_KEY
-    }`
+    }`,{cancelToken: source.token}
   );
 };
 
-export const getLastMatches = (id, amount) => {
+export const getLastMatches = (id, amount, source) => {
   if (typeof amount !== "number") amount = 5;
   return Axios.get(
     `https://cors-anywhere.herokuapp.com/https://euw1.api.riotgames.com/lol/match/v3/matchlists/by-account/${id}?endIndex=${amount}&api_key=${
       process.env.REACT_APP_RIOT_KEY
-    }`
+    }`,{cancelToken: source.token}
   );
 };
 
@@ -67,20 +67,21 @@ export const getChampionNameFromId = id => {
   return "Jax";
 };
 
-export const searchSummoner = (input, dispatch, callback, errCallback) => {
-  getSummonerByName(input)
+export const searchSummoner = (input, dispatch, source) => {
+
+    if(isEmpty(input) || !isString(input)) return;
+
+  getSummonerByName(input, source)
     .then(res => {
       console.log(res);
       dispatch({
         type: "SET_SUMMONER",
         payload: res.data,
-        callback: callback
       });
       if (isEmpty(res.data)) {
         dispatch({
           type: "SET_ERROR",
           payload: { response: { status: 404 } },
-          callback: errCallback
         });
       }
     })
@@ -90,7 +91,6 @@ export const searchSummoner = (input, dispatch, callback, errCallback) => {
         dispatch({
           type: "SET_ERROR",
           payload: { response: { status: 404 } },
-          callback: errCallback
         });
       } else {
         dispatch({

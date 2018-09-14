@@ -18,6 +18,9 @@ import Error from "../layout/Error";
 import MatchCard from "../layout/MatchCard/MatchCard";
 import timeSince from "../../util/TimeSince";
 
+const CancelToken = Axios.CancelToken;
+const source = CancelToken.source();
+
 const Ranked = ({ ranked, loaded }) => (
   <React.Fragment>
     <div className="col-12 col-md-6 mb-3">
@@ -41,10 +44,12 @@ const Ranked = ({ ranked, loaded }) => (
   </React.Fragment>
 );
 
+
+
 class SummonerPage extends Component {
   state = {
     error: {},
-    loaded: false
+    loaded: false,
   };
 
   componentDidMount = () => {
@@ -57,25 +62,29 @@ class SummonerPage extends Component {
     }
   }
 
+  componentWillUnmount(){
+    source.cancel("Requests canceled before unmounting")
+  }
+
   getSummonerData = () => {
     let { dispatch, summoner } = this.props.value;
     this.setState({ loaded: false });
-    getSummonerByName(this.props.match.params.summonerName)
+    getSummonerByName(this.props.match.params.summonerName, source)
+      
       .then(res => {
-        if (!isEmpty(res.data)) {
-          dispatch({
-            type: "SET_SUMMONER",
-            payload: res.data
-          });
-        }
-      })
-      .then(res => {
-        summoner = this.props.value.summoner;
+        
+
+        dispatch({
+          type: "SET_SUMMONER",
+          payload: res.data
+        });
+
+        summoner = res.data;
 
         Axios.all([
-          getSummonerRanked(summoner.id),
-          getChampionMasteries(summoner.id),
-          getLastMatches(summoner.accountId, 10)
+          getSummonerRanked(summoner.id, source),
+          getChampionMasteries(summoner.id, source),
+          getLastMatches(summoner.accountId, 10, source)
         ])
           .then(
             Axios.spread((rankedRes, masteriesRes, matchRes) => {
@@ -108,7 +117,6 @@ class SummonerPage extends Component {
                   dispatch({
                     type: "SET_LAST_MATCHES",
                     payload: newLastMatches,
-                    callback: this.setState({ loaded: true })
                   });
                   this.setState({ loaded: true });
                 })
@@ -118,26 +126,14 @@ class SummonerPage extends Component {
                     type: "SET_ERROR",
                     payload: err,
                     fatal: false,
-                    callback: this.setState({
-                      loaded: true,
-                      lastMatches: false
-                    })
                   });
                 });
             })
           )
-          .catch(err =>
-            dispatch({
-              type: "SET_ERROR",
-              payload: err,
-              fatal: false,
-              callback: this.setState({ loaded: true })
-            })
-          );
       })
       .catch(err => {
         console.log(err);
-
+        if(Axios.isCancel(err)) return;
         dispatch({
           type: "SET_ERROR",
           payload: err,

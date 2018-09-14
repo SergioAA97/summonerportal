@@ -1,11 +1,16 @@
 import React, { Component } from "react";
+import Axios from 'axios'
+import {withRouter , Link} from 'react-router-dom'
 import { escape } from "../../util/escape";
 import { searchSummoner } from "../../api/Lolapi";
+import { isEmpty } from "../../validation/is-empty";
+
+const CancelToken = Axios.CancelToken;
+const source = CancelToken.source();
 
 class Navbar extends Component {
   state = {
-    searchInput: "",
-    redirect: false
+    searchInput: ""
   };
 
   onChange = e => {
@@ -15,18 +20,24 @@ class Navbar extends Component {
 
   onSubmit = event => {
     event.preventDefault();
-    if (!this.props.value.dispatch) return;
-    this.setState({ searchInput: "" });
+    if (!this.props.value.dispatch || isEmpty(this.state.searchInput)) return;
+    
+    
     searchSummoner(
       this.state.searchInput,
       this.props.value.dispatch,
-      this.props.history.push(`/summoner/${this.state.searchInput}`)
+      source
     );
+
+    this.props.history.push(`/summoner/${this.state.searchInput}`);
+    this.setState({ searchInput: "" });
   };
+
+
   render() {
     return (
       <nav className="navbar navbar-dark bg-dark">
-        <span className="navbar-brand mb-0 h1 ">Summoner Portal</span>
+        <Link to={'/'}  className="navbar-brand mb-0 h1 " >Summoner Portal</Link>
         <form className="form-inline my-2 my-lg-0" onSubmit={this.onSubmit}>
           <div className="input-group-append">
             <input
@@ -47,4 +58,4 @@ class Navbar extends Component {
   }
 }
 
-export default Navbar;
+export default withRouter(Navbar);

@@ -7,11 +7,22 @@ import Error from "../layout/Error";
 import { isEmpty } from "../../validation/is-empty";
 import { searchSummoner as summonerSearch } from "../../api/Lolapi";
 import { escape } from "../../util/escape";
+import Axios from "axios";
+
+const CancelToken = Axios.CancelToken;
+const source = CancelToken.source();
 
 class SummonerSearch extends Component {
   state = {
     summonerName: ""
   };
+
+  componentDidMount(){
+    this.props.value.dispatch({
+      type: "SET_SUMMONER",
+      payload: {}
+    })
+  }
 
   onChange = event => {
     let input = escape(event.target.value, true, true);
@@ -33,23 +44,30 @@ class SummonerSearch extends Component {
     }
 
     input = escape(input, true, true);
-    summonerSearch(input, dispatch);
+    summonerSearch(input, dispatch, source);
   };
 
   render() {
-    return (
-      <Consumer>
-        {value => {
-          const { dispatch, error, summoner } = value;
 
-          if (!isEmpty(error) && error.response.status !== 404)
-            return <Error />;
+          const { dispatch, error, summoner } = this.props.value;
+          console.log(summoner,error);
 
           let inputHelp = "";
-          if (!isEmpty(error) && error.response.status === 404)
-            inputHelp = "Summoner not found, try again.";
 
-          if (!isEmpty(summoner))
+
+          if(!isEmpty(error)){
+            if(!Axios.isCancel(error)){
+              if(error.hasOwnProperty("response")){
+                if(error.response.status === 404){
+                  inputHelp = "Summoner not found, try again."
+                }else{
+                  return <Error />
+                }
+              }
+            }
+          }
+
+          if (!isEmpty(summoner) && summoner.hasOwnProperty("name"))
             return <Redirect to={`/summoner/${summoner.name}`} />;
 
           return (
@@ -81,9 +99,8 @@ class SummonerSearch extends Component {
               </form>
             </React.Fragment>
           );
-        }}
-      </Consumer>
-    );
+        
+  
   }
 }
 

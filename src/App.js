@@ -31,9 +31,11 @@ class App extends Component {
       <Provider>
         <Router>
           <React.Fragment>
+            <Switch>
             <Route
               render={({ history }) => <NavbarWrapper history={history} />}
             />
+            </Switch>
             <Switch>
               <Route exact path="/" component={Home} />
               <Route

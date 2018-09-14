@@ -15,7 +15,7 @@ export default class Home extends Component {
           }
           return (
             <div className="container">
-              <SummonerSearch />
+              <SummonerSearch value={value}/>
             </div>
           );
         }}

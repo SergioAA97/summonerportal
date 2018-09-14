@@ -3,9 +3,7 @@ import React, { Component } from "react";
 const Context = React.createContext();
 
 const reducer = (state, action) => {
-  if (action.callback === "function") {
-    action.callback();
-  }
+
 
   switch (action.type) {
     case "SET_SUMMONER":
@@ -55,7 +53,6 @@ export class Provider extends Component {
     },
 
     dispatch: action => this.setState(state => reducer(state, action)),
-    loading: false,
     error: {}
   };
 
